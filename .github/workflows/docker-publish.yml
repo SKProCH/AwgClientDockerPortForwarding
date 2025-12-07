@@ -57,8 +57,6 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=semver,pattern=v{{major}}
-            # Tag with git sha
-            type=sha,prefix={{branch}}-
             # Tag with branch name
             type=ref,event=branch
             # Tag with PR number for pull requests
