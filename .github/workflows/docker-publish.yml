@@ -15,7 +15,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: skproch/awg-client
 
 jobs:
   build-and-push:
@@ -51,10 +51,11 @@ jobs:
           tags: |
             # Tag as 'latest' for main/master branch
             type=raw,value=latest,enable={{is_default_branch}}
-            # Tag with semantic version for tags (e.g., v1.2.3 -> 1.2.3, 1.2, 1)
+            # Tag with semantic version for tags (e.g., v1.2.3 -> 1.2.3, 1.2, 1, v1)
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
+            type=semver,pattern=v{{major}}
             # Tag with git sha
             type=sha,prefix={{branch}}-
             # Tag with branch name
@@ -63,6 +64,7 @@ jobs:
             type=ref,event=pr
 
       - name: Build and push Docker image
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: .

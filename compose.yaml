@@ -1,7 +1,9 @@
 version: "3.8"
 services:
   amnezia:
-    build: .
+    # For local build, use: build: .
+    # For pre-built image from GitHub Container Registry:
+    image: ghcr.io/skproch/awg-client:latest
     container_name: amnezia-client
     cap_add:
       - NET_ADMIN
