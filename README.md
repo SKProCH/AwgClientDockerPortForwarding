@@ -123,8 +123,5 @@ sysctl --system
     ```
     Or do it manually.
 
-    > [!TIP]
-    > If you are using awg server inside a docker container (like wg-easy) you also need to forward your port to docker container.
-
-    > [!IMPORTANT]  
-    > If you are using awg server inside a docker container (like wg-easy) you also need to forward your port to docker container.
+> [!IMPORTANT]  
+> If you are using awg server inside a docker container (like wg-easy) you also need to forward your port to docker container.
