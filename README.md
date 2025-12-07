@@ -31,7 +31,7 @@ It allows port forwarding while keeping the original IP address of the client vi
         restart: unless-stopped
     ```
 
-3. Integrate with existing services.  
+3. **Integrate with existing services:**
 
     There is 2 variants:
 
@@ -94,22 +94,22 @@ It allows port forwarding while keeping the original IP address of the client vi
     ```
 
 4. **Start:**
-```bash
-docker-compose up -d
-```
+    ```bash
+    docker-compose up -d
+    ```
 
 5. **Verify:**
-```bash
-docker logs amnezia-client
-```
+    ```bash
+    docker logs amnezia-client
+    ```
 
-6. Enable packet forwarding in your VPN server
-```bash
-echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/99-sysctl.conf
-sysctl --system
-```
+6. **Enable packet forwarding** in your VPN server:
+    ```bash
+    echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/99-sysctl.conf
+    sysctl --system
+    ```
 
-7. Enable packet forwarding
+7. **Enable port forwarding**:
 
     You can add this to your wg.conf:
     ```
