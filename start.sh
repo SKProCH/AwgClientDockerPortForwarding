@@ -6,6 +6,8 @@ sysctl -w net.ipv4.conf.all.src_valid_mark=1
 ORIG_CONF="/config/awg0.conf"
 # Path to the working copy
 WORK_CONF="/etc/amnezia/amneziawg/awg0.conf"
+# Routing table custom (random) number
+RT_TABLE=51820
 
 if [ ! -f "$ORIG_CONF" ]; then
     echo "Config file not found at $ORIG_CONF"
@@ -28,9 +30,9 @@ fi
 # 2. Copy config and disable built-in routing table
 cp "$ORIG_CONF" "$WORK_CONF"
 sed -i '/^Table/d' "$WORK_CONF"
-sed -i '/\[Interface\]/a Table = off' "$WORK_CONF"
+sed -i '/\[Interface\]/a Table = $RT_TABLE' "$WORK_CONF"
 
-echo "Starting AmneziaWG (Userspace mode)..."
+echo "Config patched with Table = $RT_TABLE. Starting AmneziaWG..."
 
 # --- IMPORTANT: Specify to use amneziawg-go ---
 # Set both variable variants for reliability
@@ -54,15 +56,14 @@ echo "VPN IP is: $VPN_IP"
 echo "Applying Policy Routing rules..."
 
 # 4. Configure Policy Routing
-ip route add default dev awg0 table 123
-ip rule add from $VPN_IP table 123 priority 456
+ip rule add from $VPN_IP table $RT_TABLE priority 456
 
 echo "Policy Routing applied. Service is ready."
 
 # 5. Cleanup handler
 cleanup() {
     echo "Stopping..."
-    ip rule del from $VPN_IP table 123 priority 456
+    ip rule del from $VPN_IP table $RT_TABLE priority 456
     awg-quick down "$WORK_CONF"
     exit 0
 }
