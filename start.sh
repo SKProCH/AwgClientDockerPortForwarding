@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sysctl -w net.ipv4.conf.all.src_valid_mark=1
+
 # Path to the original configuration file
 ORIG_CONF="/config/awg0.conf"
 # Path to the working copy
@@ -12,9 +14,15 @@ fi
 
 # 1. Preparation
 mkdir -p $(dirname $WORK_CONF)
-mkdir -p /dev/net
+if ! mkdir -p /dev/net; then
+    echo "Failed to create /dev/net directory"
+    exit 1
+fi
 if [ ! -c /dev/net/tun ]; then
-    mknod /dev/net/tun c 10 200
+    if ! mknod /dev/net/tun c 10 200; then
+        echo "Failed to create /dev/net/tun device"
+        exit 1
+    fi
 fi
 
 # 2. Copy config and disable built-in routing table
