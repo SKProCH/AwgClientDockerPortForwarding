@@ -1,0 +1,21 @@
+# AmneziaWG configuration files (contain secrets!)
+awg.conf
+*.conf
+!awg.conf.example
+
+# Docker
+.dockerignore
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
