@@ -29,8 +29,8 @@ fi
 
 # 2. Copy config and disable built-in routing table
 cp "$ORIG_CONF" "$WORK_CONF"
-sed -i '/^Table/d' "$WORK_CONF"
-sed -i '/\[Interface\]/a Table = $RT_TABLE' "$WORK_CONF"
+sed -i "/^Table/d" "$WORK_CONF"
+sed -i "/\[Interface\]/a Table = $RT_TABLE" "$WORK_CONF"
 
 echo "Config patched with Table = $RT_TABLE. Starting AmneziaWG..."
 
