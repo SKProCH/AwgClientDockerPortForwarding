@@ -37,7 +37,8 @@ It allows port forwarding while keeping the original IP address of the client vi
 
     There is 2 variants:
 
-    a. Make your services use awg-client network, e.g. traefik:
+    - Make your services use awg-client network, e.g. traefik:
+
         ```yaml
         services:
         amnezia:
@@ -70,33 +71,33 @@ It allows port forwarding while keeping the original IP address of the client vi
           # For Traefik, the wg0 interface is now "native".
           network_mode: service:amnezia-client
         ```
-    b. Make awg-client use your host network:
-        ```yaml
-        services:
-          amnezia:
-            image: ghcr.io/skproch/awg-client:main
-            container_name: amnezia-client
-            # Enable host network mode. The awg0 interface will appear on the host.
-            network_mode: host
-            # Grant permissions to manage the host's network stack
-            privileged: true
-            cap_add:
-              - NET_ADMIN
-            devices:
-              - /dev/net/tun:/dev/net/tun
-            sysctls:
-              - net.ipv4.conf.all.src_valid_mark=1
-            volumes:
-              - ./awg.conf:/config/awg0.conf:ro
-            restart: unless-stopped
-          
-          traefik:
-            # Enable host network mode, so awg client and app was in the same network
-            network_mode: host
-            ...
-        ```
-        Make sure that you also do `network_mode: host` for your app!
-        If you don't do this, Docker will create a NAT for its bridge and nothing will work.
+
+    - Make awg-client use your host network:
+
+      ```yaml
+      services:
+        amnezia:
+          image: ghcr.io/skproch/awg-client:main
+          container_name: amnezia-client
+          # Enable host network mode. The awg0 interface will appear on the host.
+          network_mode: host
+          # Grant permissions to manage the host's network stack
+          privileged: true
+          cap_add:
+            - NET_ADMIN
+          devices:
+            - /dev/net/tun:/dev/net/tun
+          volumes:
+            - ./awg.conf:/config/awg0.conf:ro
+          restart: unless-stopped
+        
+        traefik:
+          # Enable host network mode, so awg client and app was in the same network
+          network_mode: host
+          ...
+      ```
+      Make sure that you also do `network_mode: host` for your app!
+      If you don't do this, Docker will create a NAT for its bridge and nothing will work.
     
 
 5. **Start:**

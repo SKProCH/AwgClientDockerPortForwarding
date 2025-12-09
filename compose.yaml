@@ -5,12 +5,13 @@ services:
     # For pre-built image from GitHub Container Registry:
     image: ghcr.io/skproch/awg-client:latest
     container_name: amnezia-client
+    network_mode: host
+    # Grant permissions to manage the host's network stack
+    privileged: true
     cap_add:
       - NET_ADMIN
     devices:
       - /dev/net/tun:/dev/net/tun
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
     volumes:
       # Place your AmneziaWG configuration file in the same directory as docker-compose.yaml
       # and mount it inside the container as /config/awg0.conf
@@ -21,6 +22,6 @@ services:
     image: greenstatic/echo-ip
     container_name: echo-ip
     # All traffic routes through the amnezia container's network stack
-    network_mode: service:amnezia
+    network_mode: host
     depends_on:
       - amnezia
