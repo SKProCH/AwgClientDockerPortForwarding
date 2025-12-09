@@ -2,6 +2,8 @@
 
 Docker container that runs [AmneziaWG](https://github.com/amnezia-vpn/amneziawg-go) VPN client and lets port forward traffic from your server. 
 
+Big thanks [WireGuard Port Forwarding From the Internet | Pro Custodibus](https://www.procustodibus.com/blog/2022/09/wireguard-port-forward-from-internet/) for inspiration.
+
 ## What is this for?
 
 When you have a private server that’s not publicly accessible from the Internet (for example, because it’s behind NAT), but you want to expose a service running on it to public Internet traffic, you can do so via WireGuard - as long as you have another server that is publicly accessible from the Internet. 
@@ -36,9 +38,8 @@ It allows port forwarding while keeping the original IP address of the client vi
     There is 2 variants:
 
     a. Make your services use awg-client network, e.g. traefik:
-
-      ```yaml
-      services:
+        ```yaml
+        services:
         amnezia:
           image: ghcr.io/skproch/awg-client:main
           container_name: amnezia-client
@@ -58,7 +59,7 @@ It allows port forwarding while keeping the original IP address of the client vi
             - "443:443"   # HTTPS
             - "8080:8080" # Traefik Dashboard / API
             - "808:808"   # Your custom port
-
+        
         traefik:
           image: "traefik:v3.5"
           depends_on:
@@ -68,48 +69,53 @@ It allows port forwarding while keeping the original IP address of the client vi
           # Traefik uses the network interface of the amnezia-client container.
           # For Traefik, the wg0 interface is now "native".
           network_mode: service:amnezia-client
-      ```
+        ```
     b. Make awg-client use your host network:
-    ```yaml
-    services:
-      amnezia:
-        image: ghcr.io/skproch/awg-client:main
-        container_name: amnezia-client
-        # Enable host network mode. The awg0 interface will appear on the host.
-        network_mode: host
-        # Grant permissions to manage the host's network stack
-        privileged: true
-        cap_add:
-          - NET_ADMIN
-        devices:
-          - /dev/net/tun:/dev/net/tun
-        sysctls:
-          - net.ipv4.conf.all.src_valid_mark=1
-        volumes:
-          - ./awg.conf:/config/awg0.conf:ro
-        restart: unless-stopped
-      
-      traefik:
-        ...
-    ```
+        ```yaml
+        services:
+          amnezia:
+            image: ghcr.io/skproch/awg-client:main
+            container_name: amnezia-client
+            # Enable host network mode. The awg0 interface will appear on the host.
+            network_mode: host
+            # Grant permissions to manage the host's network stack
+            privileged: true
+            cap_add:
+              - NET_ADMIN
+            devices:
+              - /dev/net/tun:/dev/net/tun
+            sysctls:
+              - net.ipv4.conf.all.src_valid_mark=1
+            volumes:
+              - ./awg.conf:/config/awg0.conf:ro
+            restart: unless-stopped
+          
+          traefik:
+            # Enable host network mode, so awg client and app was in the same network
+            network_mode: host
+            ...
+        ```
+        Make sure that you also do `network_mode: host` for your app!
+        If you don't do this, Docker will create a NAT for its bridge and nothing will work.
+    
 
-4. **Start:**
+5. **Start:**
     ```bash
     docker-compose up -d
     ```
 
-5. **Verify:**
+6. **Verify:**
     ```bash
     docker logs amnezia-client
     ```
 
-6. **Enable packet forwarding** in your VPN server:
+7. **Enable packet forwarding** in your VPN server:
     ```bash
     echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/99-sysctl.conf
     sysctl --system
     ```
 
-7. **Enable port forwarding**:
+8. **Enable port forwarding**:
 
     You can add this to your wg.conf:
     ```
