@@ -44,7 +44,21 @@ if [ "$PERSISTENT_KEEPALIVE" -gt 0 ] 2>/dev/null; then
     echo "Added PersistentKeepalive = $PERSISTENT_KEEPALIVE to config"
 fi
 
-echo "Config patched with Table = $RT_TABLE. Starting AmneziaWG..."
+# Parse Addresses and add PreUp/PostDown rules
+grep -E '^\s*Address\s*=' "$WORK_CONF" | sed -E 's/^\s*Address\s*=\s*//' | tr ',' '\n' | while read -r ip_cidr; do
+    IP=$(echo "$ip_cidr" | tr -d ' ' | cut -d/ -f1)
+    if [ -n "$IP" ]; then
+        if [[ "$IP" == *":"* ]]; then
+            RULE_CMD="ip -6 rule"
+        else
+            RULE_CMD="ip rule"
+        fi
+        sed -i "/^Table = $RT_TABLE/a PostDown = $RULE_CMD del from $IP table $RT_TABLE priority 456" "$WORK_CONF"
+        sed -i "/^Table = $RT_TABLE/a PreUp = $RULE_CMD add from $IP table $RT_TABLE priority 456" "$WORK_CONF"
+    fi
+done
+
+echo "Config patched with Table = $RT_TABLE and policy rules. Starting AmneziaWG..."
 
 # --- IMPORTANT: Specify to use amneziawg-go ---
 # Set both variable variants for reliability
@@ -55,27 +69,9 @@ export WG_SUDO=1
 # Bring up the interface
 awg-quick up "$WORK_CONF"
 
-# 3. Extract VPN IP address (for Alpine)
-VPN_IP=$(ip -4 addr show awg0 | awk '/inet / {print $2}' | cut -d/ -f1)
-
-if [ -z "$VPN_IP" ]; then
-    echo "Error: Could not determine VPN IP address. Check config/logs."
-    awg-quick down "$WORK_CONF"
-    exit 1
-fi
-
-echo "VPN IP is: $VPN_IP"
-echo "Applying Policy Routing rules..."
-
-# 4. Configure Policy Routing
-ip rule add from $VPN_IP table $RT_TABLE priority 456
-
-echo "Policy Routing applied. Service is ready."
-
 # 5. Cleanup handler
 cleanup() {
     echo "Stopping..."
-    ip rule del from $VPN_IP table $RT_TABLE priority 456
     awg-quick down "$WORK_CONF"
     exit 0
 }
