@@ -8,7 +8,7 @@ Big thanks [WireGuard Port Forwarding From the Internet | Pro Custodibus](https:
 
 When you have a private server that’s not publicly accessible from the Internet (for example, because it’s behind NAT), but you want to expose a service running on it to public Internet traffic, you can do so via WireGuard - as long as you have another server that is publicly accessible from the Internet. 
 
-This docker container helps with that. It doesn't require the amnezia-wg kernel module, so it can be used in lxc containers and other environments where kernel modules are not available.
+This docker container helps with that. It doesn't require the amnezia-wg kernel module, so it can be used in lxc containers and other environments where kernel modules are not available or not installed.
 
 It allows port forwarding while keeping the original IP address of the client via policy based routing.
 

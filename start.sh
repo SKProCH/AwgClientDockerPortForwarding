@@ -60,12 +60,6 @@ done
 
 echo "Config patched with Table = $RT_TABLE and policy rules. Starting AmneziaWG..."
 
-# --- IMPORTANT: Specify to use amneziawg-go ---
-# Set both variable variants for reliability
-export WG_QUICK_USERSPACE_IMPLEMENTATION=amneziawg-go
-export AWG_QUICK_USERSPACE_IMPLEMENTATION=amneziawg-go
-export WG_SUDO=1
-
 # Bring up the interface
 awg-quick up "$WORK_CONF"
 
