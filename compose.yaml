@@ -17,7 +17,8 @@ services:
       # and mount it inside the container as /config/awg0.conf
       - ./awg.conf:/config/awg0.conf:ro
     # Optional: Configure PersistentKeepalive interval (default: 25 seconds)
-    # environment:
+    environment:
+      - WG_ENDPOINT_RESOLUTION_RETRIES=infinity
     #   - PERSISTENT_KEEPALIVE=25
     restart: unless-stopped
 

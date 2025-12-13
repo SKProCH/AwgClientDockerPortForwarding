@@ -30,6 +30,8 @@ It allows port forwarding while keeping the original IP address of the client vi
           - net.ipv4.conf.all.src_valid_mark=1
         volumes:
           - ./awg.conf:/config/awg0.conf:ro
+        environment:
+          - WG_ENDPOINT_RESOLUTION_RETRIES=infinity
         restart: unless-stopped
     ```
 
@@ -52,6 +54,8 @@ It allows port forwarding while keeping the original IP address of the client vi
             - net.ipv4.conf.all.src_valid_mark=1
           volumes:
             - ./awg.conf:/config/awg0.conf:ro
+          environment:
+            - WG_ENDPOINT_RESOLUTION_RETRIES=infinity
           restart: unless-stopped
           # !!! PORTS FROM TRAEFIK HERE !!!
           # Because the network stack is now shared, ports are published by the "owner" of the network.
@@ -89,6 +93,8 @@ It allows port forwarding while keeping the original IP address of the client vi
             - /dev/net/tun:/dev/net/tun
           volumes:
             - ./awg.conf:/config/awg0.conf:ro
+          environment:
+            - WG_ENDPOINT_RESOLUTION_RETRIES=infinity
           restart: unless-stopped
         
         traefik:
