@@ -16,6 +16,9 @@ services:
       # Place your AmneziaWG configuration file in the same directory as docker-compose.yaml
       # and mount it inside the container as /config/awg0.conf
       - ./awg.conf:/config/awg0.conf:ro
+    # Optional: Configure PersistentKeepalive interval (default: 25 seconds)
+    # environment:
+    #   - PERSISTENT_KEEPALIVE=25
     restart: unless-stopped
 
   my-app:
