@@ -100,6 +100,22 @@ It allows port forwarding while keeping the original IP address of the client vi
       If you don't do this, Docker will create a NAT for its bridge and nothing will work.
     
 
+4. **Configuration (Optional):**
+
+    You can configure the container behavior using environment variables:
+
+    - `PERSISTENT_KEEPALIVE` - Sets the PersistentKeepalive interval in seconds for the WireGuard peer connection. This helps maintain the connection through NAT and firewalls.
+      - Default: `25` seconds
+      - Set to `0` to disable
+      - Example:
+        ```yaml
+        services:
+          amnezia:
+            ...
+            environment:
+              - PERSISTENT_KEEPALIVE=25
+        ```
+
 5. **Start:**
     ```bash
     docker-compose up -d

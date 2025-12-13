@@ -8,6 +8,9 @@ ORIG_CONF="/config/awg0.conf"
 WORK_CONF="/etc/amnezia/amneziawg/awg0.conf"
 # Routing table custom (random) number
 RT_TABLE=51820
+# PersistentKeepalive interval in seconds (default: 25)
+# Set to 0 to disable, or configure via PERSISTENT_KEEPALIVE environment variable
+PERSISTENT_KEEPALIVE="${PERSISTENT_KEEPALIVE:-25}"
 
 if [ ! -f "$ORIG_CONF" ]; then
     echo "Config file not found at $ORIG_CONF"
@@ -31,6 +34,15 @@ fi
 cp "$ORIG_CONF" "$WORK_CONF"
 sed -i "/^Table/d" "$WORK_CONF"
 sed -i "/\[Interface\]/a Table = $RT_TABLE" "$WORK_CONF"
+
+# 3. Add PersistentKeepalive to [Peer] section if configured
+if [ "$PERSISTENT_KEEPALIVE" -gt 0 ] 2>/dev/null; then
+    # Remove any existing PersistentKeepalive settings
+    sed -i "/^PersistentKeepalive/d" "$WORK_CONF"
+    # Add PersistentKeepalive after [Peer] section
+    sed -i "/\[Peer\]/a PersistentKeepalive = $PERSISTENT_KEEPALIVE" "$WORK_CONF"
+    echo "Added PersistentKeepalive = $PERSISTENT_KEEPALIVE to config"
+fi
 
 echo "Config patched with Table = $RT_TABLE. Starting AmneziaWG..."
 
